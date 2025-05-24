@@ -7,6 +7,8 @@ public static class LocationMappings
         {
             Id = entity.Id,
             Name = entity.Name,
+            Details = entity.Details,
+            Address = entity.Address,
             Journal = entity.Journal,
             Date = entity.Date,
             ImageUrl = $"/locations/{entity.Id}/image",
@@ -20,6 +22,8 @@ public static class LocationMappings
         {
             UserId = userId,
             Name = dto.Name,
+            Details = dto.Details,
+            Address = dto.Address,
             Journal = dto.Journal,
             Date = dto.Date,
             Latitude = dto.Latitude,
@@ -40,6 +44,8 @@ public static class LocationMappings
     public static void UpdateFromDto(this Location entity, CreateLocationRequest dto)
     {
         entity.Name = dto.Name;
+        entity.Details = dto.Details;
+        entity.Address = dto.Address;
         entity.Journal = dto.Journal;
         entity.Date = dto.Date;
         entity.Latitude = dto.Latitude;

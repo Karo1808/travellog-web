@@ -1,7 +1,10 @@
 import { locationsArraySchema } from "@/lib/validations/location";
 import apiClient from "../apiClient";
+import { getToken } from "@/lib/token";
 
 export const getLocations = async () => {
+  if (!getToken()) return [];
+
   const result = await apiClient.get("/locations");
 
   const raw = locationsArraySchema.parse(result);

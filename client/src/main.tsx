@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import TanstackQuery from "@/providers/react-query.tsx";
 import { MapProvider } from "react-map-gl/mapbox";
+import mapboxgl from "mapbox-gl";
 
 export const router = createRouter({
   routeTree,
@@ -36,6 +37,8 @@ function InnerApp() {
   const rqCtx = getContext();
   return <RouterProvider router={router} context={{ auth, ...rqCtx }} />;
 }
+
+mapboxgl.prewarm();
 
 function App() {
   return (

@@ -20,13 +20,18 @@ import useDelayedSpinner from "@/hooks/useDelayedSpinner";
 import { locationOptions } from "@/api/queries/locationOptions";
 import { getContext } from "@/providers/react-query";
 import { useRef } from "react";
+import { useLocationStore } from "@/hooks/useLocationStore";
+import { useMenuStore } from "@/hooks/useMenuStore";
 
-interface MenuProps {
-  location?: string;
-  onClose: () => void;
-}
+const CreateMenu = () => {
+  const location = useLocationStore((state) => state.location);
+  const setCurrentLocationId = useLocationStore(
+    (state) => state.setCurrentLocationId,
+  );
 
-const CreateMenu = ({ location, onClose }: MenuProps) => {
+  const closeMenu = useMenuStore((state) => state.close);
+  const setMenuMode = useMenuStore((state) => state.setMode);
+
   const form = useForm<LocationForm>({
     resolver: zodResolver(locationFormSchema),
     defaultValues: {
@@ -67,9 +72,9 @@ const CreateMenu = ({ location, onClose }: MenuProps) => {
       });
 
       form.reset();
-      toast.success("Lokalizacja dodana pomyślnie");
-      onClose();
-      // TODO: update to navigate to location and remove toast
+
+      setCurrentLocationId(newLocation.id);
+      setMenuMode("view");
     },
     onSettled: () => {
       stopSpinner();
@@ -86,8 +91,12 @@ const CreateMenu = ({ location, onClose }: MenuProps) => {
 
     const { lat, lng } = map!.getCenter();
 
+    if (!location) return;
+
     const body: locationRequestSchema = {
-      name: location!,
+      name: location?.name,
+      details: location?.details,
+      address: location?.address,
       date: values.date,
       image: values.image,
       journal: values.journal,
@@ -100,7 +109,7 @@ const CreateMenu = ({ location, onClose }: MenuProps) => {
 
   if (!map) {
     toast.error("Mapa nie została załadowana");
-    onClose();
+    closeMenu();
     return;
   }
 
@@ -113,7 +122,7 @@ const CreateMenu = ({ location, onClose }: MenuProps) => {
         <div className="text-[#333130] font-medium flex gap-6 flex-col items-start h-full">
           <div className="flex gap-2">
             <MapPin strokeWidth={2} className="text-primary" />
-            <h2>{location}</h2>
+            <h2>{location?.details}</h2>
           </div>
           <FormField
             control={form.control}

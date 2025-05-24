@@ -5,6 +5,13 @@ public class CreateLocationRequest
     [Required, MaxLength(100)]
     public string Name { get; set; } = null!;
 
+
+    [Required, MaxLength(100)]
+    public string Details { get; set; } = null!;
+
+    [Required, MaxLength(100)]
+    public string Address { get; set; } = null!;
+
     public IFormFile Image { get; set; } = null!;
 
     [MaxLength(1_000)]

@@ -23,8 +23,9 @@ public class GeoCodingService : IGeoCodingService
 
         return new ReverseGeocodeResponse
         {
-            Formatted = $"{feat.Properties.Name ?? feat.Properties.Street ?? feat.Properties.County}, {feat.Properties.City}, {feat.Properties.Country}",
-            Name = feat.Properties.Name,
+            Name = feat.Properties.Name ?? feat.Properties.City ?? feat.Properties.County,
+            Details = $"{feat.Properties.Name ?? feat.Properties.Street ?? feat.Properties.County}, {feat.Properties.City}, {feat.Properties.Country}",
+            Address = feat.Properties.Name is not null ? $"{feat.Properties.Address_line2}" : $"{feat.Properties.Address_line1}, {feat.Properties.Address_line2}",
             PlaceType = feat.Properties.PlaceType,
             Longitude = feat.Geometry.Coordinates[0],
             Latitude = feat.Geometry.Coordinates[1],
@@ -47,6 +48,8 @@ public class GeoCodingService : IGeoCodingService
             public string City { get; set; } = null!;
             public string Country { get; set; } = null!;
             public string County { get; set; } = null!;
+            public string Address_line1 { get; set; } = null!;
+            public string Address_line2 { get; set; } = null!;
             public string? Name { get; set; }
             public string[]? PlaceType { get; set; }
         }

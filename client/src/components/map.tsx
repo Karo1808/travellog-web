@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import Map, { Marker, Popup, Source } from "react-map-gl/mapbox";
+import Map, { Marker, Popup, Source, type MapProps } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect } from "react";
 import { useAuth } from "@/providers/auth";
@@ -13,12 +13,9 @@ import useMyMap from "@/hooks/useMyMap";
 import Capsule from "./capsule";
 import { Button } from "./ui/button";
 
-interface MyMapProps {
-  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setLocation: React.Dispatch<React.SetStateAction<string | undefined>>;
-}
+interface MyMapProps extends MapProps {}
 
-function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
+function MyMap(props: MyMapProps) {
   const {
     viewState,
     hoveredPopup,
@@ -38,7 +35,7 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
   const navigate = useNavigate();
 
   const { data: locations, error } = useSuspenseQuery(
-    locationOptions.locations(),
+    locationOptions.locations(isAuthenticated),
   );
 
   useEffect(() => {
@@ -57,6 +54,7 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
   return (
     <>
       <Map
+        {...props}
         {...viewState}
         id="myMap"
         onMove={onMove}
@@ -73,7 +71,7 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
         terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
         ref={mapRef}
         onClick={(e) => {
-          onMapClick(handleAuth, e, setIsMenuOpen, setLocation);
+          onMapClick(handleAuth, e);
         }}
         onLoad={({ target: map }) => {
           map.addLayer({
@@ -108,7 +106,7 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
             offset={[0, 22]}
             onClick={({ originalEvent }) => {
               originalEvent.stopPropagation();
-              onMarkerClick(location.latitude, location.longitude);
+              onMarkerClick(location.latitude, location.longitude, location.id);
             }}
           >
             <MapPin
@@ -131,14 +129,16 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
         ))}
 
         {hoveredPopup && (
-          // TODO: Animate Popup and hover
           <Popup
             latitude={hoveredPopup.lat}
             longitude={hoveredPopup.lon}
             anchor="bottom"
-            offset={[0, -90]}
+            offset={[0, -65]}
             closeButton={false}
-            className="rounded-xl text-[13px] max-w-50"
+            style={{
+              borderRadius: "50%",
+            }}
+            className="text-[13px] max-w-50"
           >
             <div className="flex gap-2">
               <MapPinIcon strokeWidth={2} size={20} className="text-primary" />
@@ -152,7 +152,7 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
               onClick={() => {
                 onZoomClick("in");
               }}
-              className="rounded-0 border-b-1 border-accent hover:text-primary cursor-pointer [&_svg:not([class*='size-'])]:size-5"
+              className="rounded-t-md rounded-b-none border-b-1 border-accent hover:text-primary cursor-pointer [&_svg:not([class*='size-'])]:size-5"
               variant="ghost"
             >
               <Plus />
@@ -161,7 +161,7 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
               onClick={() => {
                 onZoomClick("out");
               }}
-              className="rounded-0 border-accent hover:text-primary cursor-pointer [&_svg:not([class*='size-'])]:size-5"
+              className="rounded-b-md rounded-t-none border-accent hover:text-primary cursor-pointer [&_svg:not([class*='size-'])]:size-5"
               variant="ghost"
             >
               <Minus />
@@ -169,14 +169,14 @@ function MyMap({ setIsMenuOpen, setLocation }: MyMapProps) {
           </Capsule>
           <Capsule>
             <Button
-              className="rounded-0 border-b-1 border-accent hover:text-primary [&_svg:not([class*='size-'])]:size-5"
+              className="rounded-t-md rounded-b-none border-b-1 border-accent hover:text-primary [&_svg:not([class*='size-'])]:size-5"
               variant="ghost"
               onClick={onChangeDimensionClick}
             >
               {dimension === "2d" ? <Box /> : <Square />}
             </Button>
             <Button
-              className="rounded-0 border-accent hover:text-primary [&_svg:not([class*='size-'])]:size-5"
+              className="rounded-b-md rounded-t-none border-accent hover:text-primary [&_svg:not([class*='size-'])]:size-5"
               variant="ghost"
               onClick={onResetLocation}
             >

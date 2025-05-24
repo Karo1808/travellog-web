@@ -8,6 +8,8 @@ export const postLocation = async (body: locationRequestSchema) => {
   const formData = new FormData();
 
   formData.append("Name", body.name);
+  formData.append("Details", body.details);
+  formData.append("Address", body.address);
   formData.append("Journal", body.journal);
   formData.append("Date", body.date.toISOString());
   formData.append("Latitude", body.latitude.toString());

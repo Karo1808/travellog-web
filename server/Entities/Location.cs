@@ -7,6 +7,8 @@ public class Location
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
     public string Name { get; set; } = null!;
+    public string Details { get; set; } = null!;
+    public string Address { get; set; } = null!;
     public byte[] Image { get; set; } = [];
     public string? ImageMime { get; set; }
     public string Journal { get; set; } = null!;

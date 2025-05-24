@@ -27,6 +27,12 @@ export const locationRequestSchema = locationFormSchema.extend({
   name: z
     .string({ required_error: "Nazwa jest wymagana" })
     .min(1, { message: "Nazwa nie może być pusta" }),
+  details: z
+    .string({ required_error: "Dłuższa nazwa jest wymagana" })
+    .min(1, { message: "Dłuższa Nazwa nie może być pusta" }),
+  address: z
+    .string({ required_error: "Adres jest wymagany" })
+    .min(1, { message: "Adres nie może być pusta" }),
   latitude: z
     .number({ required_error: "Szerokość geograficzna jest wymagana" })
     .min(-90, { message: "Szerokość geograficzna musi być ≥ -90" })
@@ -46,6 +52,12 @@ export const locationResponseSchema = z.object({
   name: z
     .string({ required_error: "Nazwa jest wymagana" })
     .min(1, { message: "Nazwa nie może być pusta" }),
+  details: z
+    .string({ required_error: "Dłuższa nazwa jest wymagana" })
+    .min(1, { message: "Dłuższa Nazwa nie może być pusta" }),
+  address: z
+    .string({ required_error: "Adres jest wymagany" })
+    .min(1, { message: "Adres nie może być pusta" }),
   imageUrl: z.string(),
   journal: z.string({ required_error: "Dziennik jest wymagany" }),
   date: z

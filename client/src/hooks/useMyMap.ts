@@ -2,6 +2,10 @@ import { postGeoCodeReverse } from "@/api/services/postGeocodeReverse";
 import type { LatLon } from "@/lib/validations/geo";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { MapMouseEvent, MapRef, ViewState } from "react-map-gl/mapbox";
+import { useLocationStore } from "./useLocationStore";
+import { useMenuStore } from "./useMenuStore";
+import { getContext } from "@/providers/react-query";
+import { locationOptions } from "@/api/queries/locationOptions";
 
 const initialViewState: ViewState = {
   longitude: 10,
@@ -12,17 +16,18 @@ const initialViewState: ViewState = {
   padding: {},
 };
 
-const ZOOM_THRESHOLD = 16 as const;
-const MAX_ZOOM_ON_CLICK = 16.5 as const;
+const ZOOM_THRESHOLD = 17 as const;
+const MAX_ZOOM_ON_CLICK = 17.5 as const;
 const AUTO_PITCH = 60 as const;
 
 const handleFly = ({ mapRef, lat, lon }: LatLon & { mapRef: MapRef }) => {
   mapRef.flyTo({
     zoom: MAX_ZOOM_ON_CLICK,
     center: [lon, lat],
-    speed: 1.4,
     essential: true,
-    maxZoom: MAX_ZOOM_ON_CLICK,
+    pitch: AUTO_PITCH,
+    curve: 1.5,
+    speed: 1.5,
   });
 };
 
@@ -36,6 +41,14 @@ const useMyMap = () => {
   >(null);
 
   const [dimension, setDimension] = useState<"3d" | "2d">("2d");
+
+  const setLocation = useLocationStore((state) => state.setLocation);
+  const setCurrentLocationId = useLocationStore(
+    (state) => state.setCurrentLocationId,
+  );
+
+  const openMenu = useMenuStore((state) => state.open);
+  const setMenuMode = useMenuStore((state) => state.setMode);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -71,41 +84,48 @@ const useMyMap = () => {
   }, []);
 
   const onMapClick = useCallback(
-    async (
-      executeBefore: () => void,
-      e: MapMouseEvent,
-      setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>,
-      setLocation: React.Dispatch<React.SetStateAction<string | undefined>>,
-    ) => {
+    async (executeBefore: () => void, e: MapMouseEvent) => {
       executeBefore();
 
       if (!mapRef.current) return;
-
       const { lat, lng: lon } = e.lngLat;
 
       handleFly({ mapRef: mapRef.current, lat, lon });
 
-      mapRef.current?.once("moveend", () => setIsMenuOpen(true));
+      mapRef.current?.once("moveend", openMenu);
 
-      const { formatted } = await postGeoCodeReverse({
+      const { details, address, name } = await postGeoCodeReverse({
         lat,
         lon,
       });
 
-      setLocation(formatted);
+      setLocation({ address, details, name });
+      setMenuMode("create");
     },
     [],
   );
 
   const onMarkerClick = useCallback(
-    (lat: number, lon: number, executeAfter?: (id: number) => void) => {
+    (
+      lat: number,
+      lon: number,
+      locationId: number,
+      executeAfter?: (id: number) => void,
+    ) => {
       if (!mapRef.current) return;
 
       handleFly({ mapRef: mapRef.current, lat, lon });
 
-      mapRef.current?.once("moveend", () =>
-        executeAfter?.(hoveredPopup?.id ?? 0),
-      );
+      mapRef.current?.once("moveend", () => {
+        executeAfter?.(hoveredPopup?.id ?? 0);
+        openMenu();
+      });
+
+      setMenuMode("view");
+      setCurrentLocationId(locationId);
+      const { queryClient } = getContext();
+
+      queryClient.prefetchQuery(locationOptions.location(locationId));
     },
     [],
   );

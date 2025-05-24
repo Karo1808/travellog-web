@@ -8,8 +8,15 @@ import {
   useNavigate,
 } from "@tanstack/react-router";
 import { LogIn, LogOut } from "lucide-react";
+import { locationOptions } from "@/api/queries/locationOptions";
+import MyMap from "@/components/map";
 
 export const Route = createFileRoute("/_app")({
+  loader: (opts) => {
+    opts.context.queryClient.ensureQueryData(
+      locationOptions.locations(opts.context.auth?.isAuthenticated!),
+    );
+  },
   component: RouteComponent,
 });
 
@@ -62,7 +69,10 @@ function RouteComponent() {
       </div>
 
       <div className="p-3">
-        <Outlet />
+        <>
+          <MyMap />
+          <Outlet />
+        </>
       </div>
     </div>
   );

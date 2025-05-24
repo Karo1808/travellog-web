@@ -1,31 +1,32 @@
-import { locationOptions } from "@/api/queries/locationOptions";
 import CreateMenu from "@/components/create-menu";
-import MyMap from "@/components/map";
 import Menu from "@/components/menu";
+import ViewMenu from "@/components/view-menu";
+import ViewMenuSkeleton from "@/components/view-menu-skeleton";
+import { useMenuStore } from "@/hooks/useMenuStore";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { Suspense } from "react";
 
 export const Route = createFileRoute("/_app/")({
-  loader: (opts) =>
-    opts.context.queryClient.ensureQueryData(locationOptions.locations()),
-  component: App,
+  component: RouteComponent,
 });
 
-function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [location, setLocation] = useState<string | undefined>();
+function RouteComponent() {
+  const mode = useMenuStore((state) => state.mode);
 
   return (
     <>
-      <MyMap setIsMenuOpen={setIsMenuOpen} setLocation={setLocation} />
-      <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
-        <CreateMenu
-          location={location}
-          onClose={() => {
-            setIsMenuOpen(false);
-          }}
-        />
-      </Menu>
+      {mode === "create" && (
+        <Menu menuVariant={"create"} buttonVariant={"create"}>
+          <CreateMenu />
+        </Menu>
+      )}
+      {mode == "view" && (
+        <Menu menuVariant={"view"} buttonVariant={"view"}>
+          <Suspense fallback={<ViewMenuSkeleton />}>
+            <ViewMenu />
+          </Suspense>
+        </Menu>
+      )}
     </>
   );
 }

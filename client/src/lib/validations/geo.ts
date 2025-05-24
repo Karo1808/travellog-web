@@ -21,8 +21,9 @@ export const LatLonSchema = z.object({
 export type LatLon = z.infer<typeof LatLonSchema>;
 
 export const reverseGeocodeResponseSchema = z.object({
-  formatted: z.string(),
-  name: z.string().nullable().optional(),
+  name: z.string(),
+  details: z.string(),
+  address: z.string(),
   placeType: z.array(z.string()).optional().nullable(),
   longitude: z.number(),
   latitude: z.number(),

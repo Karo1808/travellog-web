@@ -20,6 +20,16 @@ public class LocationService : ILocationService
         return entity.ToDto();
     }
 
+    public async Task<LocationDto?> GetAsync(int id, string userId)
+    {
+        var location = await _db.Locations
+                        .AsNoTracking()
+                        .Where(l => l.UserId == userId && l.Id == id)
+                        .SingleOrDefaultAsync();
+
+        return location?.ToDto();
+    }
+
 
     public async Task<IEnumerable<LocationDto>> ListAsync(string userId)
     {

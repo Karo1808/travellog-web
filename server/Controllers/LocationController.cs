@@ -50,11 +50,10 @@ public class LocationsController : ControllerBase
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        // TODO: change
-        // var loc = await _locationSvc.GetAsync(id, userId);
-        // if (loc == null)
-        //     return NotFound();
-        return Ok("");
+        var loc = await _locationSvc.GetAsync(id, userId);
+        if (loc is null)
+            return NotFound();
+        return Ok(loc);
     }
 
     [HttpGet("{id:int}/image")]
