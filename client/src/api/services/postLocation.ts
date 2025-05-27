@@ -11,7 +11,7 @@ export const postLocation = async (body: locationRequestSchema) => {
   formData.append("Details", body.details);
   formData.append("Address", body.address);
   formData.append("Journal", body.journal);
-  formData.append("Date", body.date.toISOString());
+  formData.append("Date", body.date.toLocaleDateString());
   formData.append("Latitude", body.latitude.toString());
   formData.append("Longitude", body.longitude.toString());
   formData.append("Image", body.image, body.image.name);

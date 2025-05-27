@@ -6,7 +6,7 @@ import type { PopoverProps } from "@radix-ui/react-popover";
 import { useMenuStore } from "@/hooks/useMenuStore";
 import { cva, type VariantProps } from "class-variance-authority";
 
-const menuVariants = cva("w-120 h-[80vh]", {
+const menuVariants = cva("w-120 h-[80vh] flex flex-col overflow-y-hidden", {
   variants: {
     variant: {
       create: "p-10",
@@ -52,7 +52,10 @@ const Menu = ({
   return (
     <Popover open={isMenuOpen} onOpenChange={closeMenu} {...popoverProps}>
       <PopoverAnchor asChild>
-        <div aria-hidden className="fixed top-205 right-30 z-50 min-w-max" />
+        <div
+          aria-hidden
+          className="fixed bottom-[10%] right-30 z-50 min-w-max"
+        />
       </PopoverAnchor>
 
       <PopoverContent

@@ -16,8 +16,8 @@ const initialViewState: ViewState = {
   padding: {},
 };
 
-const ZOOM_THRESHOLD = 17 as const;
-const MAX_ZOOM_ON_CLICK = 17.5 as const;
+const ZOOM_THRESHOLD = 16 as const;
+const MAX_ZOOM_ON_CLICK = 16.5 as const;
 const AUTO_PITCH = 60 as const;
 
 const handleFly = ({ mapRef, lat, lon }: LatLon & { mapRef: MapRef }) => {
@@ -48,6 +48,7 @@ const useMyMap = () => {
   );
 
   const openMenu = useMenuStore((state) => state.open);
+  const closeMenu = useMenuStore((state) => state.close);
   const setMenuMode = useMenuStore((state) => state.setMode);
 
   useEffect(() => {
@@ -92,7 +93,11 @@ const useMyMap = () => {
 
       handleFly({ mapRef: mapRef.current, lat, lon });
 
-      mapRef.current?.once("moveend", openMenu);
+      mapRef.current?.once("moveend", () => {
+        setTimeout(() => {
+          openMenu();
+        }, 400);
+      });
 
       const { details, address, name } = await postGeoCodeReverse({
         lat,
@@ -118,6 +123,7 @@ const useMyMap = () => {
 
       mapRef.current?.once("moveend", () => {
         executeAfter?.(hoveredPopup?.id ?? 0);
+        closeMenu();
         openMenu();
       });
 

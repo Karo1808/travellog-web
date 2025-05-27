@@ -39,6 +39,48 @@ public class LocationService : ILocationService
         return list.Select(l => l.ToDto());
     }
 
+    public async Task<LocationDto?> UpdateAsync(UpdateLocationRequest dto, string userId)
+    {
+        var entity = await _db.Locations
+                              .Where(l => l.UserId == userId && l.Id == dto.Id)
+                              .SingleOrDefaultAsync();
+
+        if (entity == null)
+            return null;
+
+        entity.Date = dto.Date;
+        entity.Journal = dto.Journal ?? entity.Journal;
+
+        if (dto.Image is not null)
+        {
+            using var ms = new MemoryStream();
+            await dto.Image.CopyToAsync(ms);
+            entity.Image = ms.ToArray();
+            entity.ImageMime = dto.Image.ContentType;
+        }
+
+        await _db.SaveChangesAsync();
+
+        return entity.ToDto();
+    }
+
+    public async Task<bool> DeleteAsync(int id, string userId)
+    {
+        var location = await _db.Locations
+                                 .AsNoTracking()
+                                 .Where(l => l.UserId == userId && l.Id == id)
+                                 .SingleOrDefaultAsync();
+
+        if (location == null)
+            return false;
+
+        _db.Locations.Remove(location);
+
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+
     public async Task<(byte[] Data, string MimeType)?> GetImageAsync(int id, string userId)
     {
         var img = await _db.Locations
