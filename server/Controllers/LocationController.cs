@@ -56,6 +56,39 @@ public class LocationsController : ControllerBase
         return Ok(loc);
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<bool>> DeleteById(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var deleted = await _locationSvc.DeleteAsync(id, userId);
+        if (!deleted)
+            return NotFound();
+
+        return NoContent();
+
+    }
+
+
+
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<LocationDto>> Edit(int id, [FromForm] UpdateLocationRequest dto)
+    {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        if (id != dto.Id) return BadRequest();
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var updated = await _locationSvc.UpdateAsync(dto, userId);
+        return Ok(updated);
+    }
+
     [HttpGet("{id:int}/image")]
     public async Task<IActionResult> GetImage(int id)
     {

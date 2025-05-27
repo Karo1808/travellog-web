@@ -23,6 +23,14 @@ export const locationFormSchema = z.object({
     .max(1000, "Maksymalnie 1000 znaków"),
 });
 
+export type LocationForm = z.infer<typeof locationFormSchema>;
+
+export const editLocationSchema = locationFormSchema.extend({
+  id: z.number(),
+});
+
+export type EditLocation = z.infer<typeof editLocationSchema>;
+
 export const locationRequestSchema = locationFormSchema.extend({
   name: z
     .string({ required_error: "Nazwa jest wymagana" })
@@ -44,8 +52,6 @@ export const locationRequestSchema = locationFormSchema.extend({
 });
 
 export type locationRequestSchema = z.infer<typeof locationRequestSchema>;
-
-export type LocationForm = z.infer<typeof locationFormSchema>;
 
 export const locationResponseSchema = z.object({
   id: z.number().int({ message: "Id musi być liczbą całkowitą" }),

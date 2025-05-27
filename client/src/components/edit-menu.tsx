@@ -8,25 +8,27 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem, FormMessage } from "./ui/form";
 import { locationFormSchema } from "@/lib/validations/location";
-import type {
-  LocationForm,
-  locationRequestSchema,
-} from "@/lib/validations/location";
+import type { EditLocation, LocationForm } from "@/lib/validations/location";
 import { useMap } from "react-map-gl/mapbox";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
-import { postLocation } from "@/api/services/postLocation";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import useDelayedSpinner from "@/hooks/useDelayedSpinner";
 import { locationOptions } from "@/api/queries/locationOptions";
 import { getContext } from "@/providers/react-query";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useLocationStore } from "@/hooks/useLocationStore";
 import { useMenuStore } from "@/hooks/useMenuStore";
+import { putLocation } from "@/api/services/putLocation";
 
-const CreateMenu = () => {
-  const location = useLocationStore((state) => state.location);
-  const setCurrentLocationId = useLocationStore(
-    (state) => state.setCurrentLocationId,
+const EditMenu = () => {
+  const currentLocationId = useLocationStore(
+    (state) => state.currentLocationId,
+  );
+
+  if (!currentLocationId) return;
+
+  const { data: location } = useSuspenseQuery(
+    locationOptions.location(currentLocationId),
   );
 
   const closeMenu = useMenuStore((state) => state.close);
@@ -35,9 +37,9 @@ const CreateMenu = () => {
   const form = useForm<LocationForm>({
     resolver: zodResolver(locationFormSchema),
     defaultValues: {
-      date: undefined,
+      date: location.date,
       image: undefined,
-      journal: "",
+      journal: location.journal,
     },
   });
 
@@ -47,10 +49,33 @@ const CreateMenu = () => {
     blobUrlRef.current = URL.createObjectURL(form.getValues()?.image);
   const imageUrl = blobUrlRef.current;
 
+  useEffect(() => {
+    if (!location.imageUrl) return;
+
+    (async () => {
+      try {
+        const res = await fetch(location.imageUrl);
+        if (!res.ok) throw new Error("Image fetch failed");
+        const blob = await res.blob();
+
+        const file = new File([blob], "current-image.jpg", { type: blob.type });
+
+        const dt = new DataTransfer();
+        dt.items.add(file);
+
+        form.setValue("image", dt.files[0], { shouldValidate: true });
+
+        blobUrlRef.current = URL.createObjectURL(file);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [location]);
+
   const mutation = useMutation({
-    mutationFn: postLocation,
+    mutationFn: async (body: EditLocation) => await putLocation(body),
     onError: () => {
-      toast.error("Lokalizacja nie została dodana");
+      toast.error("Lokalizacja nie została edytowana");
     },
     onSuccess: async (newLocation) => {
       const { queryClient } = getContext();
@@ -72,7 +97,6 @@ const CreateMenu = () => {
 
       form.reset();
 
-      setCurrentLocationId(newLocation.id);
       setMenuMode("view");
     },
     onSettled: () => {
@@ -88,19 +112,13 @@ const CreateMenu = () => {
   const onSubmit = async (values: LocationForm) => {
     startSpinner();
 
-    const { lat, lng } = map!.getCenter();
-
     if (!location) return;
 
-    const body: locationRequestSchema = {
-      name: location?.name,
-      details: location?.details,
-      address: location?.address,
+    const body: EditLocation = {
+      id: currentLocationId,
       date: values.date,
       image: values.image,
       journal: values.journal,
-      latitude: lat,
-      longitude: lng,
     };
 
     mutation.mutate(body);
@@ -115,10 +133,10 @@ const CreateMenu = () => {
   return (
     <Form {...form}>
       <form
-        className="relative flex flex-col overflow-y-auto"
+        className="relative h-full overflow-y-auto"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <div className="text-[#333130] font-medium flex gap-6 flex-col items-start h-full overflow-y-auto">
+        <div className="text-[#333130] font-medium flex gap-6 flex-col items-start h-full">
           <div className="flex gap-2">
             <MapPin strokeWidth={2} className="text-primary" />
             <h2>{location?.details}</h2>
@@ -145,7 +163,7 @@ const CreateMenu = () => {
             render={({ field }) => (
               <FormItem>
                 <ImagePicker
-                  previewImage="/placeholder-2.jpg"
+                  previewImage={location.imageUrl}
                   value={field.value}
                   onChange={field.onChange}
                   ref={field.ref}
@@ -174,7 +192,7 @@ const CreateMenu = () => {
           />
           <Button className="w-full justify-self-end">
             {showSpinner && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Dodaj wpis
+            Edytuj wpis
           </Button>
         </div>
       </form>
@@ -182,4 +200,4 @@ const CreateMenu = () => {
   );
 };
 
-export default CreateMenu;
+export default EditMenu;

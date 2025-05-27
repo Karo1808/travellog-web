@@ -12,12 +12,12 @@ import { Box, Locate, MapPinIcon, Minus, Plus, Square } from "lucide-react";
 import useMyMap from "@/hooks/useMyMap";
 import Capsule from "./capsule";
 import { Button } from "./ui/button";
+import { useMediaQuery } from "react-responsive";
 
 interface MyMapProps extends MapProps {}
 
 function MyMap(props: MyMapProps) {
   const {
-    viewState,
     hoveredPopup,
     dimension,
     onMapClick,
@@ -25,10 +25,11 @@ function MyMap(props: MyMapProps) {
     onMarkerHover,
     onZoomClick,
     onChangeDimensionClick,
+    viewState,
     onResetLocation,
-    onMove,
     mapRef,
     setHoveredPopup,
+    onMove,
   } = useMyMap();
 
   const { isAuthenticated, user } = useAuth();
@@ -37,6 +38,8 @@ function MyMap(props: MyMapProps) {
   const { data: locations, error } = useSuspenseQuery(
     locationOptions.locations(isAuthenticated),
   );
+
+  const isMobile = useMediaQuery({ maxWidth: 1000 });
 
   useEffect(() => {
     if (error) {
@@ -62,12 +65,13 @@ function MyMap(props: MyMapProps) {
         attributionControl={false}
         mapboxAccessToken={env.VITE_MAPBOX_ACCESS_TOKEN}
         style={{
-          width: "calc(100vw - 24px)",
-          height: "calc(100vh - 24px)",
+          width: isMobile ? "100vw" : "calc(100vw - 24px)",
+          height: isMobile ? "100vh" : "calc(100vh - 24px)",
           zIndex: "1",
         }}
         doubleClickZoom={false}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
+        projection={"mercator"}
+        mapStyle="mapbox://styles/karo1808/cmb6i9qxl00nc01qxdos970aa"
         terrain={{ source: "mapbox-dem", exaggeration: 1.5 }}
         ref={mapRef}
         onClick={(e) => {
@@ -146,7 +150,7 @@ function MyMap(props: MyMapProps) {
             </div>
           </Popup>
         )}
-        <div className="flex flex-col gap-5 bottom-10 right-10 fixed z-10 ">
+        <div className="flex flex-col gap-5 bottom-7 right-7 lg:bottom-10 lg:right-10 fixed z-10 ">
           <Capsule>
             <Button
               onClick={() => {
