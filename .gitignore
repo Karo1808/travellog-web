@@ -29,8 +29,6 @@ publish/
 !**/packages/build/
 !**/packages/repositories.config
 
-## Entity Framework
-*.db
 
 ## ASP.NET Scaffolding
 ScaffoldingReadMe.txt
