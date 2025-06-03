@@ -1,8 +1,5 @@
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.OpenApi; // Corrected using directive
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace server.Services.OpenApi
 {

@@ -15,12 +15,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "./ui/dialog";
-import {
-  EllipsisVerticalIcon,
-  PencilIcon,
-  SearchIcon,
-  TrashIcon,
-} from "lucide-react";
+import { EllipsisVerticalIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { useMenuStore } from "@/hooks/useMenuStore";
 import { useMutation } from "@tanstack/react-query";
 import { deleteLocation } from "@/api/services/deleteLocation";
@@ -78,9 +73,6 @@ const Dropdown = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="min-w-fit ml-20 z-100">
-          <DropdownMenuItem>
-            <SearchIcon className="size-3" /> Szukaj
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleEditClick}>
             <PencilIcon className="size-3" /> Edytuj
           </DropdownMenuItem>

@@ -58,7 +58,15 @@ function RouteComponent() {
         className="absolute right-0 -top-0 flex w-max items-start gap-2 lg:bg-background bg-transparent px-1 lg:px-5 py-2 shadow-none lg:shadow-sm z-10"
       >
         <Button
-          onClick={handleLogout}
+          onClick={
+            isAuthenticated
+              ? handleLogout
+              : () => {
+                  navigate({
+                    to: "/auth/login",
+                  });
+                }
+          }
           size="icon"
           variant="ghost"
           className="bg-transparent text-5xl ml-8 hover:cursor-pointer"

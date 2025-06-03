@@ -1,9 +1,5 @@
-import { useMenuStore } from "@/hooks/useMenuStore";
-import { Drawer, DrawerContent } from "./ui/drawer";
 import type { ContentProps } from "vaul";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "./ui/scroll-area";
 import MyDrawer from "./my-drawer";
 
 const menuVariants = cva(
@@ -35,7 +31,11 @@ const MobileMenu = ({
   ...props
 }: MobileMenuProps) => {
   return (
-    <MyDrawer menuVariant={menuVariant} thumbClassName={thumbClassName}>
+    <MyDrawer
+      menuVariant={menuVariant}
+      thumbClassName={thumbClassName}
+      {...props}
+    >
       {children}
     </MyDrawer>
   );

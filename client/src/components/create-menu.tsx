@@ -115,7 +115,7 @@ const CreateMenu = () => {
   return (
     <Form {...form}>
       <form
-        className="relative flex flex-col overflow-y-auto"
+        className="relative flex flex-col overflow-y-auto h-full"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <div className="text-[#333130] font-medium flex gap-6 flex-col items-start h-full overflow-y-auto">

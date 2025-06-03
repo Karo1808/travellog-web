@@ -2,7 +2,6 @@ import { useLocationStore } from "@/hooks/useLocationStore";
 import { useMenuStore } from "@/hooks/useMenuStore";
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import { useEffect } from "react";
 import { Drawer, type ContentProps } from "vaul";
 
 const menuVariants = cva(

@@ -6,6 +6,7 @@ import { useLocationStore } from "./useLocationStore";
 import { useMenuStore } from "./useMenuStore";
 import { getContext } from "@/providers/react-query";
 import { locationOptions } from "@/api/queries/locationOptions";
+import { useMediaQuery } from "react-responsive";
 
 const initialViewState: ViewState = {
   longitude: 10,
@@ -51,6 +52,8 @@ const useMyMap = () => {
   const closeMenu = useMenuStore((state) => state.close);
   const setMenuMode = useMenuStore((state) => state.setMode);
 
+  const isMobile = useMediaQuery({ maxWidth: 1000 });
+
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -94,9 +97,12 @@ const useMyMap = () => {
       handleFly({ mapRef: mapRef.current, lat, lon });
 
       mapRef.current?.once("moveend", () => {
-        setTimeout(() => {
-          openMenu();
-        }, 400);
+        setTimeout(
+          () => {
+            openMenu();
+          },
+          isMobile ? 400 : 200,
+        );
       });
 
       const { details, address, name } = await postGeoCodeReverse({

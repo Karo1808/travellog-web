@@ -5,7 +5,6 @@ import { formatPolishDate, splitTextToParagraphs } from "@/lib/utils";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CalendarIcon, MapPinIcon } from "lucide-react";
 import { toast } from "sonner";
-import { ScrollArea } from "./ui/scroll-area";
 import Dropdown from "./dropdown";
 
 const ViewMenu = () => {
