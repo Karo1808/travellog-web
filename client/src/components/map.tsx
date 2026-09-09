@@ -62,7 +62,6 @@ function MyMap(props: MyMapProps) {
         id="myMap"
         onMove={onMove}
         language="pl"
-        attributionControl={false}
         mapboxAccessToken={env.VITE_MAPBOX_ACCESS_TOKEN}
         style={{
           width: isMobile ? "100vw" : "calc(100vw - 24px)",
