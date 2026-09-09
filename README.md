@@ -1,174 +1,81 @@
-# Instrukcja instalacji
+# TravelLog
 
-**Krótki opis projektu:**
-Projekt składa się z dwóch części:
+TravelLog to aplikacja webowa do zapisywania odwiedzonych miejsc na interaktywnej mapie. Użytkownik może utworzyć konto, dodawać wpisy z datą, opisem i zdjęciem oraz przeglądać i edytować swoją historię podróży.
 
-- **client** – frontend oparty na pnpm (np. React/Vite)
-- **server** – backend w C# (.NET 8), udostępniający API (REST)
+## Funkcje
 
-README zawiera instrukcje dotyczące instalacji, konfiguracji i uruchomienia obu modułów.
+- rejestracja i logowanie z uwierzytelnianiem JWT,
+- interaktywna mapa Mapbox,
+- odwrotne geokodowanie przez Geoapify,
+- dodawanie miejsc z datą, opisem, współrzędnymi i zdjęciem,
+- przeglądanie, edytowanie i usuwanie wpisów,
+- responsywny interfejs na komputery i urządzenia mobilne.
 
----
+## Technologie
 
-## 1. Wymogi wstępne
+- React 19, TypeScript, Vite i TanStack Router/Query,
+- Tailwind CSS i komponenty Radix UI,
+- ASP.NET Core 9, Entity Framework Core i ASP.NET Identity,
+- SQLite,
+- Mapbox i Geoapify.
 
-1. **Node.js + pnpm**
+## Wymagania
 
-   - Zainstaluj Node.js (zalecana wersja ≥16.x): [https://nodejs.org/](https://nodejs.org/)
-   - Zainstaluj pnpm globalnie:
+- Node.js 22,
+- pnpm 10.11.0,
+- .NET SDK 9.
 
-     ```bash
-     npm install -g pnpm
-     ```
+## Konfiguracja
 
-   - Oficjalna strona pnpm: [https://pnpm.io/installation](https://pnpm.io/installation)
+Zainstaluj zależności z katalogu głównego:
 
-2. **.NET SDK**
-
-   - Zainstaluj .NET SDK (zalecana wersja 8.0 lub wyższa): [https://dotnet.microsoft.com/en-us/download](https://dotnet.microsoft.com/en-us/download)
-   - Upewnij się, że `dotnet` jest dostępny w ścieżce systemowej.
-
-3. **Weryfikacja instalacji**
-   Po zainstalowaniu sprawdź działanie w terminalu:
-
-   ```bash
-   pnpm --version    # np. 8.10.0
-   dotnet --version  # np. 8.0.100
-   ```
-
----
-
-## 2. Instalacja zależności
-
-### 2.1. Frontend (katalog `client`)
-
-1. Przejdź do katalogu `client`:
-
-   ```bash
-   cd client
-   ```
-
-2. Zainstaluj zależności:
-
-   ```bash
-   pnpm install
-   ```
-
-3. (Opcjonalnie) Wróć do katalogu głównego:
-
-   ```bash
-   cd ..
-   ```
-
-### 2.2. Backend (katalog `server`)
-
-1. Przejdź do katalogu `server`:
-
-   ```bash
-   cd server
-   ```
-
-2. Przywróć pakiety NuGet:
-
-   ```bash
-   dotnet restore
-   ```
-
-3. (Opcjonalnie) Wróć do katalogu głównego:
-
-   ```bash
-   cd ..
-   ```
-
----
-
-## 3. Konfiguracja zmiennych środowiskowych
-
-### 3.1. Frontend (`client`)
-
-1. Przejdź do katalogu `client` (jeśli jeszcze w nim nie jesteś):
-
-   ```bash
-   cd client
-   ```
-
-2. Utwórz plik `.env` – skopiuj zawartość pliku przykładowego:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Zarejestruj się w Mapbox: [https://account.mapbox.com/auth/signup/](https://account.mapbox.com/auth/signup/) i zaloguj.
-
-4. W konsoli Mapbox (sekcja „Access Tokens”):
-
-   - Utwórz nowy klucz (Publishable Token).
-
-   ![](/images/create-token.png)
-
-5. W pliku `.env` dodaj lub podmień linię:
-
-   ```env
-   VITE_MAPBOX_TOKEN=<TWÓJ_MAPBOX_TOKEN>
-   ```
-
-6. Wróć do katalogu głównego projektu:
-
-   ```bash
-   cd ..
-   ```
-
-### 3.2. Backend (`server`)
-
-1. Przejdź do katalogu `server`:
-
-   ```bash
-   cd server
-   ```
-
-2. Zarejestruj się w Geoapify: [https://www.geoapify.com/reverse-geocoding-api](https://www.geoapify.com/reverse-geocoding-api) i utwórz projekt, aby uzyskać klucz API.
-
-3. W konsoli Geoapify utwórz nowy klucz i skopiuj go.
-
-   ![](/images/create-token-geoapify.png)
-
-4. Zainicjuj mechanizm **user-secrets** i ustaw klucz:
-
-   ```bash
-   dotnet user-secrets init
-   dotnet user-secrets set "Geoapify:ApiKey" "<TWÓJ_GEOAPIFY_API_KEY>"
-   ```
-
-5. Wróć do katalogu głównego projektu:
-
-   ```bash
-   cd ..
-   ```
-
----
-
-### 4. Uruchomienie aplikacji
-
-By uruchomić aplikacje należy wejść do głownego katalogu projektu oraz wykonać komendy:
-
-```
-pnpm i
-pnpm run dev
+```bash
+pnpm install --frozen-lockfile
+pnpm --dir client install --frozen-lockfile
+dotnet restore server/server.csproj
 ```
 
-Aplikacja będzie dostępna pod url [http://localhost:3001/](http://localhost:3001/)
+Utwórz konfigurację frontendu:
 
-Dokumentacja serwera jest dostępna pod url [http://localhost:5114/scalar/](http://localhost:5114/scalar/)
+```bash
+cp client/.env.example client/.env
+```
 
-## 7. Podsumowanie
+W pliku `client/.env` ustaw publiczny token Mapbox:
 
-- Zainstaluj **Node.js + pnpm** oraz **.NET SDK**.
-- Sprawdź wersje: `pnpm --version`, `dotnet --version`.
-- W katalogu `client` uruchom: `pnpm install`.
-- W katalogu `server` uruchom: `dotnet restore`.
-- Skonfiguruj zmienne środowiskowe:
+```env
+VITE_MAPBOX_ACCESS_TOKEN=<token_mapbox>
+```
 
-  - Frontend: `client/.env` → `VITE_MAPBOX_TOKEN=<token z Mapbox>`
-  - Backend: `dotnet user-secrets set "Geoapify:ApiKey" "<klucz z Geoapify>"`
+Klucz Geoapify przechowuj w .NET User Secrets:
 
-- Uruchom aplikacje z katalogu głównego projektu `pnpm dev`
+```bash
+dotnet user-secrets set "Geoapify:ApiKey" "<klucz_geoapify>" --project server
+```
+
+Repozytorium zawiera lokalną bazę SQLite z syntetycznymi danymi demonstracyjnymi przeznaczonymi wyłącznie do tego POC.
+
+## Uruchomienie
+
+Uruchom frontend i backend jednocześnie:
+
+```bash
+pnpm dev
+```
+
+- aplikacja: <http://localhost:3000>
+- API: <http://localhost:5114/api>
+- dokumentacja API: <http://localhost:5114/scalar/v1>
+
+Dokumentacja API jest dostępna tylko w środowisku deweloperskim.
+
+## Weryfikacja
+
+```bash
+pnpm --dir client build
+dotnet build server/server.csproj
+```
+
+## Licencja i usługi zewnętrzne
+
+Kod jest udostępniany na licencji ISC. Mapa i dane geograficzne korzystają z usług Mapbox oraz Geoapify i podlegają warunkom tych dostawców.
